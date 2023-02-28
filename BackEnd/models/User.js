@@ -8,7 +8,7 @@ var userSchema = new Schema({
     image: {        
         type: String
     }
-}, { collation: "users"});
+});
 
 var User = mongoose.model("User", userSchema);
 

@@ -7,8 +7,6 @@ const { v4: uuidv4 } = require('uuid')
 
 const DIR = "./public/";
 
-console.log(uuidv4());
-
 const storage = multer.diskStorage({
     destination: (req, file, cb)=>{
         cb(null, DIR);
@@ -47,8 +45,6 @@ router.post("/register", upload.single("image"), (req, res, next) => {
         image: url +"/public/" + req.file.filename
     });
 
-    console.log(user);
-
     user.save().then(result =>{
         res.status(201).json({
             message: "Kullanıcı kaydı başarıyla tamamlandı!",
@@ -62,17 +58,15 @@ router.post("/register", upload.single("image"), (req, res, next) => {
     });
 });
 
-router.post("/login", (req, res, next) => {
-    const login = {
-        email: req.body.email,
-        password: req.body.password
-    };
-
-    User.find({email: login.email, password: login.password}).then(data => {
-        res.status(200).json({
-            users: data
-        });
+router.post("/login", (req, res) => {
+    const {email, password} = req.body;   
+    console.log(req.body);
+    User.find({email: email, password: password}).then(data => {
+        if(data.length > 0)
+            res.send({user: data[0]});
+        else    
+            res.status(400).send({message: "Kullanıcı adı ya da şifre yanlış!"});
     });
-});
+})
 
 module.exports = router;

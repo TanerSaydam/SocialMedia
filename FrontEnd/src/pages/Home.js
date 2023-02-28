@@ -11,7 +11,7 @@ function Home() {
         backgroundColor: "white"
     }
 
-    const user = JSON.parse(localStorage.getItem("token")).user;
+    const user = JSON.parse(localStorage.getItem("token")).user;    
     let image = (user != null && user != undefined) ? user.image : "";
 
     const post = {
@@ -38,8 +38,8 @@ function Home() {
     return (
         <>
             <div className="form-group" style={divStyle}>
-                <img src={image} style={imgStyle} />
-                <input placeholder="Ne düşünüyorsun?" className="home-input-control mx-2" />
+                <img src={image} style={imgStyle} />                
+                <input placeholder="Ne düşünüyorsun?" className="home-input-control mx-2"/>
                 <button className="btn btn-primary">Paylaş</button>
             </div>
             <hr />

@@ -15,20 +15,23 @@ function Login() {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-
-        console.log(inputs);
-
-        fetch("http://localhost:5000/api/users")
-        .then(res=> res.json())
-        .then(res=>{
-            //console.log(res);
-            localStorage.setItem("token", JSON.stringify(res[0]));
-            navigate("/");
-        },
-        err=>{
-            console.log(err);
-        })
+        let api = "http://localhost:4000/api/login";
         
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(inputs)
+        };
+        fetch(api, requestOptions)
+            .then(response => response.json())
+            .then(data => {
+                if(data.message == undefined){
+                    localStorage.setItem("token", JSON.stringify(data));
+                    navigate("/");
+                }else{
+                    alert(data.message);
+                }
+            });
     }
 
     const divStyle = {
