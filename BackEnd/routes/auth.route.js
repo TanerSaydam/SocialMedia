@@ -60,7 +60,7 @@ router.post("/register", upload.single("image"), (req, res, next) => {
 
 router.post("/login", (req, res) => {
     const {email, password} = req.body;   
-    console.log(req.body);
+    
     User.find({email: email, password: password}).then(data => {
         if(data.length > 0)
             res.send({user: data[0]});

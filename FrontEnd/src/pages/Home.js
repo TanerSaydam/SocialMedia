@@ -1,4 +1,8 @@
+import { useEffect, useState } from 'react';
+
 function Home() {
+    const [postText, setPostText] = useState("");
+    const [posts, setPosts] = useState([]);
     const imgStyle = {
         width: "40px",
         borderRadius: "20px"
@@ -11,47 +15,66 @@ function Home() {
         backgroundColor: "white"
     }
 
-    const user = JSON.parse(localStorage.getItem("token")).user;    
+    const user = JSON.parse(localStorage.getItem("token")).user;
     let image = (user != null && user != undefined) ? user.image : "";
 
-    const post = {
-        userImg: image,
-        userName: "Taner Saydam",
-        content: `I have just published an article on how to use HttpClient with practical examples in C#, as well as some networking basics!
+    const getAllPost = async () => {
+        const api = "http://localhost:4000/api/post/getAll";
 
-            In the world of microservice architecture, remote communication between multiple services is essential.
-
-            Understanding how things work under the hood is imperative, and that starts with the basics of networking.
-
-            Cheers! 👋`
+        await fetch(api)
+        .then(res => res.json())
+        .then(data => {            
+            setPosts(data);
+        });
     }
 
-    const posts = [];
-
-
-    const postElements = () => {
-        for (let i = 0; i < 10; i++) {
-            posts.push(post);
+    const sendPost = () => {
+        let model = 
+        {
+            userId: user._id,
+            content: postText,
+            date: new Date()
         }
-    }   
+
+        const api = "http://localhost:4000/api/post";
+
+        const requestOptions = {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(model)
+        }
+
+        fetch(api,requestOptions)
+        .then(response => response.json())
+        .then(data => {
+            setPosts(data);
+        });
+    }
+  
+
+    useEffect(() => {
+        getAllPost();
+    }, []);
 
     return (
         <>
             <div className="form-group" style={divStyle}>
-                <img src={image} style={imgStyle} />                
-                <input placeholder="Ne düşünüyorsun?" className="home-input-control mx-2"/>
-                <button className="btn btn-primary">Paylaş</button>
+                <img src={image} style={imgStyle} />
+                <button 
+                    className="btn btn-default mx-2" 
+                    style={{width: "90%", border: "1px solid #ccc"}}
+                    data-bs-toggle="modal"
+                    data-bs-target="#postModal">
+                    Gönderi başlat
+                </button>
             </div>
             <hr />
 
-            {postElements()}
-            
             {posts.map((element, i) => {
-                return (
                     <div key={i} className="form-group mt-4" style={divStyle}>
                         <img src={element.userImg} style={imgStyle} />
                         <label className="mx-2">element.userName</label>
-                        <p dangerouslySetInnerHTML={{__html: element.content}}>
+                        <p dangerouslySetInnerHTML={{ __html: element.content }}>
                         </p>
                         <hr />
                         <button className="btn btn-default">
@@ -63,8 +86,30 @@ function Home() {
                             Yorum Yap
                         </button>
                     </div>
-                );
-            })}
+            })}            
+
+            <div className="modal fade" id="postModal" tabIndex="-1" aria-labelledby="postModalLabel" aria-hidden="true">
+                <div className="modal-dialog">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h1 className="modal-title fs-5" id="postModalLabel">Gönderi Oluştur</h1>
+                            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div className="modal-body">
+                            <textarea 
+                                id="postText" 
+                                className="form-control" 
+                                rows="5"
+                                value={postText}
+                                onChange={(e) => setPostText(e.target.value)}>
+                            </textarea>
+                        </div>
+                        <div className="modal-footer">                            
+                            <button type="button" onClick={sendPost} className="btn btn-primary">Paylaş</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </>
 
     );

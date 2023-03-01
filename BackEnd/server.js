@@ -4,7 +4,8 @@ let express = require("express"),
     bodyParser = require("body-parser"),
     dbConfig = require("./database/db");
 
-const api = require("./routes/auth.route");
+const authApi = require("./routes/auth.route");
+const postApi = require("./routes/post.route");
 
 //MongoDB Configuration
 mongoose.Promise = global.Promise;
@@ -25,7 +26,8 @@ app.use(cors());
 
 app.use("/public", express.static("public"));
 
-app.use("/api", api)
+app.use("/api", authApi)
+app.use("/api", postApi)
 
 const port = process.env.POST || 4000;
 const server = app.listen(port, () => {
@@ -39,7 +41,6 @@ app.use((req, res, next) => {
 });
 
 app.use(function (err, req, res, next){
-    //console.log(err.message);
     if(!err.statusCode) err.statusCode = 500;
     res.status(err.statusCode).send(err.message);
 });
