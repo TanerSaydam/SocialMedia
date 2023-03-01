@@ -3,7 +3,7 @@ let express = require("express"),
     mongoose = require("mongoose"),    
     router = express.Router();
 
-const { v4: uuidv4 } = require('uuid')
+const { v4: uuidv4 } = require('uuid');
 
 const DIR = "./public/";
 
@@ -38,7 +38,7 @@ let User = require("../models/User");
 router.post("/register", upload.single("image"), (req, res, next) => {
     const url = req.protocol + "://" + req.get("host");
     const user = new User({
-        _id: new mongoose.Types.ObjectId(),
+        _id: uuidv4(),
         name: req.body.name,
         email: req.body.email,
         password: req.body.password,

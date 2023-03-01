@@ -6,6 +6,7 @@ let express = require("express"),
 
 const authApi = require("./routes/auth.route");
 const postApi = require("./routes/post.route");
+const likeApi = require("./routes/like.route");
 
 //MongoDB Configuration
 mongoose.Promise = global.Promise;
@@ -26,8 +27,9 @@ app.use(cors());
 
 app.use("/public", express.static("public"));
 
-app.use("/api", authApi)
-app.use("/api", postApi)
+app.use("/api", authApi);
+app.use("/api", postApi);
+app.use("/api", likeApi);
 
 const port = process.env.POST || 4000;
 const server = app.listen(port, () => {

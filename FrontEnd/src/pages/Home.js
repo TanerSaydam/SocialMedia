@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
+import Post from './Post';
 
-function Home() {
+function Home() {    
     const [postText, setPostText] = useState("");
     const [posts, setPosts] = useState([]);
     const imgStyle = {
@@ -18,51 +19,49 @@ function Home() {
     const user = JSON.parse(localStorage.getItem("token")).user;
     let image = (user != null && user != undefined) ? user.image : "";
 
-    const getAllPost = async () => {
-        const api = "http://localhost:4000/api/post/getAll";
-
-        await fetch(api)
-        .then(res => res.json())
-        .then(data => {            
-            setPosts(data);
-        });
-    }
-
-    const sendPost = () => {
-        let model = 
+    const sendPost = async () => {
+        let model =
         {
-            userId: user._id,
+            _id: "",
+            user_id: user._id,
             content: postText,
             date: new Date()
         }
 
-        const api = "http://localhost:4000/api/post";
+        const api = "http://localhost:4000/api/post/add";
 
         const requestOptions = {
             method: "POST",
-            headers: {"Content-Type": "application/json"},
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify(model)
         }
 
-        fetch(api,requestOptions)
-        .then(response => response.json())
-        .then(data => {
-            setPosts(data);
-        });
+        const result = await fetch(api, requestOptions);
+        await fetchData();
+        setPostText("");
+        let element = document.getElementById("postModalCloseBtn");
+        element.click();   
     }
-  
+
+    const fetchData = async () => {
+        const api = "http://localhost:4000/api/post/getAll";
+
+        const result = await fetch(api);
+        const jsonResult = await result.json();             
+        setPosts(jsonResult);
+    }
 
     useEffect(() => {
-        getAllPost();
+        fetchData();
     }, []);
 
     return (
-        <>
+        <>  
             <div className="form-group" style={divStyle}>
                 <img src={image} style={imgStyle} />
-                <button 
-                    className="btn btn-default mx-2" 
-                    style={{width: "90%", border: "1px solid #ccc"}}
+                <button
+                    className="btn btn-default mx-2"
+                    style={{ width: "90%", border: "1px solid #ccc" }}
                     data-bs-toggle="modal"
                     data-bs-target="#postModal">
                     Gönderi başlat
@@ -70,41 +69,25 @@ function Home() {
             </div>
             <hr />
 
-            {posts.map((element, i) => {
-                    <div key={i} className="form-group mt-4" style={divStyle}>
-                        <img src={element.userImg} style={imgStyle} />
-                        <label className="mx-2">element.userName</label>
-                        <p dangerouslySetInnerHTML={{ __html: element.content }}>
-                        </p>
-                        <hr />
-                        <button className="btn btn-default">
-                            <i className="fa-regular fa-thumbs-up mx-2"></i>
-                            Beğen
-                        </button>
-                        <button className="btn btn-default mx-2">
-                            <i className="fa-regular fa-comment mx-2"></i>
-                            Yorum Yap
-                        </button>
-                    </div>
-            })}            
+            <Post posts={posts} myClick={fetchData}/>
 
             <div className="modal fade" id="postModal" tabIndex="-1" aria-labelledby="postModalLabel" aria-hidden="true">
                 <div className="modal-dialog">
                     <div className="modal-content">
                         <div className="modal-header">
                             <h1 className="modal-title fs-5" id="postModalLabel">Gönderi Oluştur</h1>
-                            <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <button type="button" id="postModalCloseBtn" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div className="modal-body">
-                            <textarea 
-                                id="postText" 
-                                className="form-control" 
+                            <textarea
+                                id="postText"
+                                className="form-control"
                                 rows="5"
                                 value={postText}
                                 onChange={(e) => setPostText(e.target.value)}>
                             </textarea>
                         </div>
-                        <div className="modal-footer">                            
+                        <div className="modal-footer">
                             <button type="button" onClick={sendPost} className="btn btn-primary">Paylaş</button>
                         </div>
                     </div>
